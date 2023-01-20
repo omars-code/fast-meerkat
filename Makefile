@@ -3,30 +3,48 @@ TARGET_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 # ...and turn them into do-nothing targets
 $(eval $(TARGET_ARGS):;@:)
 
-# container
-start:
-	docker-compose up -d
+COMPOSE=docker compose
 
-stop:
-	docker-compose stop
+help:		   		## Show this help.
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-restart:
-	docker-compose stop $(TARGET_ARGS) && docker-compose start $(TARGET_ARGS)
+# containers
 
-rebuild:
-	docker-compose build --force-rm $(TARGET_ARGS)
+start: 				## start all containers
+	$(COMPOSE) -f docker-compose.yml up -d
 
-clean-restart:
-	docker-compose stop $(TARGET_ARGS) && docker-compose rm -f $(TARGET_ARGS) && make rebuild $(TARGET_ARGS) && docker-compose up -d
+start-foreground:
+	$(COMPOSE) -f docker-compose.yml up
 
-bash:
-	docker-compose exec $(TARGET_ARGS) zsh
+stop: 				## stop all containers
+	$(COMPOSE) -f docker-compose.yml stop
 
-logs:
-	docker-compose logs -f $(TARGET_ARGS)
+ls: 				## list all containers
+	$(COMPOSE) -f docker-compose.yml ps
 
-local:
-	pipenv sync
+rebuild: 			## force rebuild a specific container
+	$(COMPOSE) -f docker-compose.yml build --force-rm $(TARGET_ARGS)
+
+logs: 				## tail container logs (example: make logs extractor)
+	$(COMPOSE) -f docker-compose.yml logs -f $(TARGET_ARGS)
+
+exec: 				## Open a bash of a specific container (usage: make exec [container] [command_to_execute]) example: make exec sender sh ls -la
+	$(COMPOSE) -f docker-compose.yml exec $(TARGET_ARGS)
+
+bash: 				## Open a bash of a specific container (usage: make bash [container])
+	$(COMPOSE) -f docker-compose.yml exec $(TARGET_ARGS) bash
+
+clean: 				## Purge container, removes the container, image and volumes attached to it, use with caution (usage: make clean [container])
+	$(COMPOSE) -f docker-compose.yml stop; $(COMPOSE) -f docker-compose.yml rm -svf
+
+restart: 			## Restart a specific container (usage: make restart [container])
+	$(COMPOSE) -f docker-compose.yml stop $(TARGET_ARGS) && $(COMPOSE) -f docker-compose.yml start $(TARGET_ARGS)
+
+clean-restart: 			## Stop, Rebuild and start a specific container(usage: make clean-restart [container])
+	$(COMPOSE) -f docker-compose.yml stop $(TARGET_ARGS) && $(COMPOSE) -f docker-compose.yml rm -f $(TARGET_ARGS) && $(COMPOSE) -f docker-compose.yml build --force-rm $(TARGET_ARGS) && $(COMPOSE) -f docker-compose.yml up -d
+
+
+# local
 
 pep8:
 	autopep8 --in-place --recursive .
@@ -43,10 +61,8 @@ install:
 	pip install -r requirements-dev.txt
 
 run:
-	@cd src; pipenv run gunicorn -b 0.0.0.0:8000 meerkat.configurations.app.main:app -w 1 -k gevent --reload && echo "success!" || { echo "Crashed!"; exit 0; }
+	@cd src; pipenv run uvicorn --host 0.0.0.0 --port 8000 meerkat.configurations.app.main:app  --reload && echo "success!" || { echo "Crashed!"; exit 0; }
 
 test:
 	pipenv run pytest --cov --cov-report html
 
-watch:
-	eval watchexec -r -e 'py' -i './src/meerkat' "docker-compose up"
