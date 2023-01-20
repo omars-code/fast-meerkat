@@ -11,6 +11,8 @@ serviceregistry = {editable = true, ref = "master", git = "https://github.com/om
 injectorfount = {editable = true, ref = "master", git = "https://gitlab.com/bookla-foundation/injector-fount.git"}
 fastapi = {extras = ["all"], version = "*"}
 uvicorn = {extras = ["standard"], version = "*"}
+beanie = "*"
+pydantic = "*"
 
 [dev-packages]
 pytest = "*"

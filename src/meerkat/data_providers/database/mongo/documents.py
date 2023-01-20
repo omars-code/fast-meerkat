@@ -1,9 +1,11 @@
-from mongoengine import Document
-from mongoengine.fields import StringField, UUIDField, BooleanField
+from beanie import Document
+from uuid import UUID, uuid4
+from pydantic import Field
 
 
 class PostDocument(Document):
-    id = UUIDField(binary=False, primary_key=True)
-    title = StringField(max_length=512, required=True)
-    body = StringField(max_length=1024, required=True)
-    published = BooleanField()
+    id: UUID = Field(default_factory=uuid4)
+    title: str
+    body: str
+    published: bool = False
+

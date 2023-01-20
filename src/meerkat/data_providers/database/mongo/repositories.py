@@ -13,15 +13,15 @@ class PostMongoRepository(PostDataProvider):
     def __init__(self, transformer: PostDocumentTransformer):
         self.transformer = transformer
 
-    def save(self, post: Post):
+    async def save(self, post: Post):
         post_document = self.transformer.transform_to_document(post)
-        post_document.save()
+        await post_document.save()
 
-    def get(self, id: Id) -> Post:
-        posts = PostDocument.objects(id=id.value)
-        if posts.count() < 1:
+    async def get(self, doc_id: Id) -> Post:
+        posts = await PostDocument.find(PostDocument.id == doc_id.value).to_list()
+        if len(posts) < 1:
             raise EntityNotFoundException(
-                "Cannot find document with id #{}".format(str(id))
+                "Cannot find document with id #{}".format(str(doc_id))
             )
 
-        return self.transformer.transform_to_domain_object(next(posts))
+        return self.transformer.transform_to_domain_object(posts[0])
