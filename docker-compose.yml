@@ -1,10 +1,10 @@
 ---
-version: "2.1"
+version: "3.1"
 
 services:
   meerkat:
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       context: ./
     env_file:
       - .env
@@ -17,7 +17,6 @@ services:
       - .docker/entrypoint.sh
     volumes:
       - ./:/code
-      - /code/packages/meerkat/.venv
     links:
       - skel_db
 
@@ -37,7 +36,7 @@ services:
     command: /bin/bash -c "envsubst < /etc/nginx/conf.d/site.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
 
   skel_db:
-    image: mongo:latest
+    image: mongo:6.0.3-nanoserver
     environment:
       - MONGO_DATA_DIR=/usr/data/db
       - MONGO_LOG_DIR=/dev/null

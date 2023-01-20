@@ -1,41 +1,26 @@
-# meerkat
+# fast meerkat
 
 What do I get out of the box ?
 
 -   Clean Architecture in Python
 
--   Falcon Framework RESTful API example
+-   FastAPI RESTful API example
 
 -   Health endpoint example
-
--   Marshmallow integration
 
 -   Docker example
 
 
-
--   Github actions example runs the following
-
--   Tests
-
--   Black
-
--   Flake8
-
--   Mypy
-
--   isort
-
 But what does it mean ?
 
--   Means it can be a starter project for your next project, whether falcon or CLI or * seriously any.
+-   Means it can be a starter project for your next project, whether FastAPI, Falcon, Fask or CLI or * seriously any.
 
 Now let's get started.
 
 Installing the precommit/prepush hooks
 ## API docs
 
-http://0.0.0.0:8021/v1/docs
+http://0.0.0.0:8021/docs
 
 ## new service [how-to]
 Write
@@ -72,5 +57,4 @@ make test
 ```
 coverage found at: htmlcov/index.html
 ## Credits
-- Bookla Foundation's Team
 - [sourcery-ai/python-best-practices-cookiecutter](https://github.com/sourcery-ai/python-best-practices-cookiecutter) project template. 
